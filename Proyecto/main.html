@@ -78,7 +78,7 @@
         </div>
     </main>
 
-    <footer class="bg-gray-800 text-white py-4 text-center text-sm">
+    <footer class="bg-gray-800 text-white py-4 text-center text-sm mt-4">
         <p>Plataforma educativa para niños – Compatible con Ceibal</p>
         <p>© 2025 Aventura Sin Gluten</p>
     </footer>
@@ -149,25 +149,31 @@ const recipes = [
       { name: 'Banana',                 glutenFree: true,  info: 'Fruta natural, siempre segura.' },
       { name: 'Harina de Almendra',     glutenFree: true,  info: 'Harina de frutos secos sin gluten.' },
       { name: 'Harina de Trigo',        glutenFree: false, info: 'Contiene gluten.' },
-      { name: 'Polvo de hornear común', glutenFree: false, info: 'Puede contener gluten.' }
+      { name: 'Polvo de hornear',       glutenFree: false, info: 'Puede contener gluten.' },
+      { name: 'Huevos',                 glutenFree: true, info: 'Los huevos son libres de gluten.' },
+      { name: 'Vainilla',               glutenFree: false, info: 'La vainilla puede contener gluten.' }
     ]
   },
   {
     title: 'Pizza de Coliflor',
     ingredients: [
       { name: 'Coliflor',             glutenFree: true,  info: 'Verdura libre de gluten.' },
-      { name: 'Harina de Arroz',      glutenFree: true,  info: 'Harina apta sin TACC.' },
-      { name: 'Salami (con gluten)',  glutenFree: false, info: 'Algunos embutidos llevan gluten de relleno.' },
-      { name: 'Queso Mozzarella',     glutenFree: true,  info: 'El queso natural no contiene gluten.' }
+      { name: 'Harina de Arroz',      glutenFree: true,  info: 'Harina apta sin gluten.' },
+      { name: 'Salami',               glutenFree: false, info: 'Algunos embutidos llevan gluten de relleno.' },
+      { name: 'Queso Mozzarella',     glutenFree: false,  info: 'El queso natural no contiene gluten, pero puede que algunos se le agregan productos en su elaboración que sí tienen gluten.' },
+      { name: 'Levadura',             glutenFree: false,  info: 'La levadura puede estar contaminada en su proceso de elaboración.' },
+      { name: 'Agua',                 glutenFree: true,  info: 'El agua son libres de gluten.' }
     ]
   },
   {
     title: 'Galletitas de Coco',
     ingredients: [
-      { name: 'Coco rallado',                   glutenFree: true,  info: 'Coco sin gluten.' },
-      { name: 'Harina de Avena certificada',    glutenFree: true,  info: 'Avena libre de gluten.' },
+      { name: 'Coco',                           glutenFree: true,  info: 'Coco es una fruta sin gluten.' },
+      { name: 'Harina de Avena certificada',    glutenFree: true,  info: 'La Avena es libre de gluten, si se encuentra procesada en una fábrica donde no procesan trigo .' },
       { name: 'Harina de Trigo',                glutenFree: false, info: 'Contiene gluten.' },
-      { name: 'Azúcar',                         glutenFree: true,  info: 'El azúcar no contiene gluten.' }
+      { name: 'Azúcar',                         glutenFree: true,  info: 'El azúcar son libres de gluten.' },
+      { name: 'Vainilla certificada',           glutenFree: true,  info: 'La vainilla certificada no contiene gluten.' },
+      { name: 'Huevos',                         glutenFree: true,  info: 'Los huevos son libres de gluten.' }
     ]
   }
 ];
@@ -217,10 +223,11 @@ function backToMenu() {
 }
 
 function nextRound() {
-  currentRound++;
-    document.getElementById('feedback').classList.add('hidden');
 
-  if (currentRound > roundsPerGame){
+  document.getElementById('feedback').classList.add('hidden');
+
+  if (currentRound >= roundsPerGame){
+    updateProgress();
     return endGame();
   } 
 
@@ -233,11 +240,11 @@ function nextRound() {
   /* ----------------- LÓGICA POR MODO DE JUEGO ----------------------- */
   if (currentGame === 'escuela') {
     // ===== MODO ESCUELA (NUEVO) =========
-    const escenario = escenariosEscuela[currentRound - 1];
+    const escenario = escenariosEscuela[currentRound];
     document.getElementById('game-title').textContent = escenario.situacion;
 
     // Renderizamos 1 fila de 2 opciones
-    gameArea.className = 'game-container grid grid-cols-1 sm:grid-cols-2 gap-4';
+    gameArea.className = 'game-container grid  gap-4';
 
     escenario.opciones.forEach(op => {
       const card = document.createElement('div');
@@ -249,8 +256,10 @@ function nextRound() {
   }
   else if (currentGame === 'cocina') {
     // ===== MODO COCINA =============================================
-    const recipe = recipes[currentRound - 1];
+    const recipe = recipes[currentRound];
     document.getElementById('game-title').textContent = `Receta: ${recipe.title} – Elige los ${recipe.ingredients.filter(i => i.glutenFree).length} ingredientes seguros`;
+    
+    gameArea.className = 'game-container grid gap-4';
 
     recipe.ingredients.forEach(item => {
       const card = document.createElement('div');
@@ -274,7 +283,7 @@ function nextRound() {
     const roundItems = [];
     for (let i = 0; i < 4; i++) roundItems.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
 
-    gameArea.className = 'game-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
+    gameArea.className = 'game-container grid gap-4';
 
     roundItems.forEach(item => {
       const card = document.createElement('div');
@@ -284,6 +293,7 @@ function nextRound() {
       gameArea.appendChild(card);
     });
   }
+  currentRound++;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -310,7 +320,7 @@ function checkSingleAnswer(isSafe, info, card) {
 /* ---------------------------------------------------------------------- */
 /* 7. CONFIRMAR SELECCIÓN EN MODO COCINA ------------------------------ */
 function confirmarSeleccion() {
-  const recipe = recipes[currentRound - 1];
+  const recipe = recipes[currentRound];
   const correctItems = recipe.ingredients.filter(i => i.glutenFree);
 
   if (selectedIngredients.length < correctItems.length) {
