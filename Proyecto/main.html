@@ -1,65 +1,519 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aventura Sin Gluten – v2</title>
+    <title>Aventura Sin Gluten</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body{font-family:'Comic Sans MS',cursive,sans-serif;background-color:#f0f9ff;color:#333}
-        .game-container{perspective:1000px}
-        .product-card{transition:transform .3s,box-shadow .3s}
-        .product-card:hover{transform:scale(1.05);box-shadow:0 10px 20px rgba(0,0,0,.1)}
-        .safe{border:5px solid #4ade80}
-        .unsafe{border:5px solid #f87171}
-        .info-bubble{animation:pulse 1.5s infinite}
-        @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
-        .progress-bar{transition:width .5s ease}
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ffffff;
+            color: #333
+        }
+
+        .game-container {
+            perspective: 1000px
+        }
+
+        .product-card {
+            transition: transform .3s, box-shadow .3s
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .1)
+        }
+
+        .safe {
+            border: 5px solid #4ade80
+        }
+
+        .unsafe {
+            border: 5px solid #f87171
+        }
+
+        .info-bubble {
+            animation: pulse 1.5s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.05)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        .progress-bar {
+            transition: width .5s ease
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(147, 51, 234, 0.8));
+            z-index: 2;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 2rem 3rem;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-button.prev {
+            left: 1.5rem;
+        }
+
+        .nav-button.next {
+            right: 1.5rem;
+        }
+
+        .indicators {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.75rem;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.3);
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .indicator:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .fun-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(251, 191, 36, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: white;
+            border: 2px solid rgba(251, 191, 36, 0.5);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .learn-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(to right, #10b981, #059669);
+            color: white;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .learn-more-btn:hover {
+            background: linear-gradient(to right, #059669, #047857);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .emoji-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .kid-friendly-text {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .slide-content {
+                padding: 1.5rem;
+            }
+
+            .nav-button {
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .nav-button.prev {
+                left: 1rem;
+            }
+
+            .nav-button.next {
+                right: 1rem;
+            }
+        }
+
+        .safe {
+            background-color: #d1fae5
+        }
+
+        .unsafe {
+            background-color: #fee2e2
+        }
+
+        .selected {
+            outline: 3px solid #f59e0b
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
-    <!-- ======= HEADER ================================================== -->
-    <header class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 shadow-lg">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold">Aventura Sin Gluten</h1>
-            <p class="text-lg md:text-xl">¡Aprende sobre celiaquía mientras te diviertes!</p>
+
+<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen pt-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="flex items-center mb-6">
+                <img src="supersingluteno.jpeg" class="w-24 h-24 mx-auto mb-4 rounded-full shadow-lg">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    Aventura Sin Gluten
+                </h1>
+                <img src="supersingluteno.jpeg" class="w-24 h-24 mx-auto mb-4 rounded-full shadow-lg">
+            </div>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Una aventura educativa para entender qué es la celiaquía de manera divertida
+            </p>
         </div>
-    </header>
+        <div id="menu">
+            <!-- Educational Carousel -->
+            <div
+                class="carousel-container w-full h-400px md:h-[400px] rounded-2xl shadow-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Slide 1: ¿Qué es la Celiaquía? -->
+                    <div class="carousel-slide">
+                        <img src="https://images.pexels.com/photos/6942020/pexels-photo-6942020.jpeg?auto=compress&cs=tinysrgb&w=800"
+                            class="slide-bg">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="max-w-4xl text-white">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="fun-badge">🤔 ¿Qué es?</span>
+                                    <div class="flex items-center gap-2 text-sm text-white/90">
+                                        <span class="emoji-icon">📚</span>
+                                        <span>Lección 1</span>
+                                        <span>•</span>
+                                        <span>3 min</span>
+                                    </div>
+                                </div>
+                                <h2
+                                    class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 kid-friendly-text">
+                                    🌾 ¿Qué es la Celiaquía?
+                                </h2>
+                                <p
+                                    class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mb-6 kid-friendly-text">
+                                    La celiaquía es cuando nuestro cuerpo no puede comer alimentos con gluten. Es como
+                                    si
+                                    nuestro estómago fuera alérgico a una proteína que está en el trigo, la avena, la
+                                    cebada
+                                    y el centeno. ¡Pero no te preocupes, hay muchos alimentos deliciosos que sí podemos
+                                    comer!
+                                </p>
+                                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                    <div class="flex items-center gap-2 text-white/90">
+                                        <span class="emoji-icon">👩‍⚕️</span>
+                                        <span class="font-medium">Dra. Ana Martínez</span>
+                                    </div>
+                                    <a href="#" class="learn-more-btn w-fit">
+                                        ¡Aprender más!
+                                        <span class="emoji-icon">🚀</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- ======= LOGO ==================================================== -->
-    <div class="text-center my-8">
-        <img src="https://placehold.co/400x300/blue/white?text=Logo+Aventura+Sin+Gluten" alt="Logo Aventura Sin Gluten" class="mx-auto h-40">
-    </div>
+                    <!-- Slide 2: Síntomas -->
+                    <div class="carousel-slide">
+                        <img src="https://images.pexels.com/photos/5452268/pexels-photo-5452268.jpeg?auto=compress&cs=tinysrgb&w=800"
+                            alt="Niño con dolor de estómago" class="slide-bg">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="max-w-4xl text-white">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="fun-badge">😰 Síntomas</span>
+                                    <div class="flex items-center gap-2 text-sm text-white/90">
+                                        <span class="emoji-icon">📚</span>
+                                        <span>Lección 2</span>
+                                        <span>•</span>
+                                        <span>4 min</span>
+                                    </div>
+                                </div>
+                                <h2
+                                    class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 kid-friendly-text">
+                                    🤒 ¿Cómo me siento si tengo celiaquía?
+                                </h2>
+                                <p
+                                    class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mb-6 kid-friendly-text">
+                                    Si comes gluten y tienes celiaquía, tu pancita puede doler, puedes sentirte muy
+                                    cansado,
+                                    tener diarrea o estreñimiento. También podrías crecer más lento o tener erupciones
+                                    en la
+                                    piel. ¡Es importante contarle a mamá y papá si te sientes así!
+                                </p>
+                                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                    <div class="flex items-center gap-2 text-white/90">
+                                        <span class="emoji-icon">👨‍⚕️</span>
+                                        <span class="font-medium">Dr. Carlos Pediatra</span>
+                                    </div>
+                                    <a href="#" class="learn-more-btn w-fit">
+                                        ¡Entender más!
+                                        <span class="emoji-icon">💡</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <main class="container mx-auto px-4 flex-grow">
-        <!-- =============== MENÚ PRINCIPAL =============================== -->
-        <div id="menu" class="text-center">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h2 class="text-2xl font-bold text-blue-600 mb-4">Mini‑Juegos</h2>
-                    <button onclick="startGame('supermercado')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg mb-3 w-full">Explorador del Supermercado</button>
-                    <button onclick="startGame('cocina')"        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg text-lg mb-3 w-full">La Cocina Sin Gluten</button>
-                    <button onclick="startGame('escuela')"       class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg text-lg w-full">Amigos en la Escuela</button>
+                    <!-- Slide 3: Alimentos Prohibidos -->
+                    <div class="carousel-slide">
+                        <img src="https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=800"
+                            alt="Pan y cereales" class="slide-bg">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="max-w-4xl text-white">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="fun-badge">🚫 No comer</span>
+                                    <div class="flex items-center gap-2 text-sm text-white/90">
+                                        <span class="emoji-icon">📚</span>
+                                        <span>Lección 3</span>
+                                        <span>•</span>
+                                        <span>3 min</span>
+                                    </div>
+                                </div>
+                                <h2
+                                    class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 kid-friendly-text">
+                                    🍞 Alimentos que debo evitar
+                                </h2>
+                                <p
+                                    class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mb-6 kid-friendly-text">
+                                    Si tienes celiaquía, no puedes comer pan normal, galletas, pasta, cereales con
+                                    gluten,
+                                    pizza tradicional o pasteles hechos con harina de trigo. ¡Pero tranquilo! Existen
+                                    versiones sin gluten de todos estos alimentos que están súper ricas.
+                                </p>
+                                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                    <div class="flex items-center gap-2 text-white/90">
+                                        <span class="emoji-icon">👩‍🍳</span>
+                                        <span class="font-medium">Chef María Nutricionista</span>
+                                    </div>
+                                    <a href="#" class="learn-more-btn w-fit">
+                                        ¡Ver alternativas!
+                                        <span class="emoji-icon">🌟</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: Alimentos Permitidos -->
+                    <div class="carousel-slide">
+                        <img src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800"
+                            alt="Frutas y verduras" class="slide-bg">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="max-w-4xl text-white">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="fun-badge">✅ Sí puedo</span>
+                                    <div class="flex items-center gap-2 text-sm text-white/90">
+                                        <span class="emoji-icon">📚</span>
+                                        <span>Lección 4</span>
+                                        <span>•</span>
+                                        <span>4 min</span>
+                                    </div>
+                                </div>
+                                <h2
+                                    class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 kid-friendly-text">
+                                    🥕 ¡Alimentos súper ricos que SÍ puedo comer!
+                                </h2>
+                                <p
+                                    class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mb-6 kid-friendly-text">
+                                    ¡Hay muchísimos alimentos deliciosos! Frutas, verduras, carnes, pescado, huevos,
+                                    lácteos, arroz, quinoa, maíz, papas y productos especiales sin gluten. ¡Incluso hay
+                                    helados, chocolates y dulces sin gluten que están buenísimos!
+                                </p>
+                                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                    <div class="flex items-center gap-2 text-white/90">
+                                        <span class="emoji-icon">🧑‍🍳</span>
+                                        <span class="font-medium">Chef Luis Sin Gluten</span>
+                                    </div>
+                                    <a href="#" class="learn-more-btn w-fit">
+                                        ¡Ver recetas!
+                                        <span class="emoji-icon">🍽️</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: Vivir Feliz con Celiaquía -->
+                    <div class="carousel-slide">
+                        <img src="https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=800"
+                            alt="Niños felices comiendo" class="slide-bg">
+                        <div class="slide-overlay"></div>
+                        <div class="slide-content">
+                            <div class="max-w-4xl text-white">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <span class="fun-badge">😊 Vida feliz</span>
+                                    <div class="flex items-center gap-2 text-sm text-white/90">
+                                        <span class="emoji-icon">📚</span>
+                                        <span>Lección 5</span>
+                                        <span>•</span>
+                                        <span>3 min</span>
+                                    </div>
+                                </div>
+                                <h2
+                                    class="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 kid-friendly-text">
+                                    🌈 ¡Puedo ser feliz y saludable!
+                                </h2>
+                                <p
+                                    class="text-lg md:text-xl text-white/95 leading-relaxed max-w-3xl mb-6 kid-friendly-text">
+                                    Tener celiaquía no me impide ser feliz, jugar con mis amigos, hacer deporte o comer
+                                    rico. Solo necesito cuidar lo que como y siempre leer las etiquetas. ¡Mis papás y
+                                    maestros me ayudan a estar seguro y saludable!
+                                </p>
+                                <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                    <div class="flex items-center gap-2 text-white/90">
+                                        <span class="emoji-icon">👨‍👩‍👧‍👦</span>
+                                        <span class="font-medium">Familia Celíaca Feliz</span>
+                                    </div>
+                                    <a href="#" class="learn-more-btn w-fit">
+                                        ¡Más consejos!
+                                        <span class="emoji-icon">💪</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h2 class="text-2xl font-bold text-purple-600 mb-4">Aprende</h2>
-                    <div class="mb-4 text-left">
-                        <h3 class="font-bold text-lg">¿Qué es la celiaquía?</h3>
-                        <p class="text-sm">Es una condición donde el gluten daña el intestino. ¡Pero hay solución!</p>
-                    </div>
-                    <div class="mb-4 text-left">
-                        <h3 class="font-bold text-lg">Símbolo Sin TACC</h3>
-                        <img src="sin_gluten_legal-01.png" alt="Símbolo Sin TACC" class="mx-auto h-20">
-                    </div>
+                <!-- Navigation Buttons -->
+                <button class="nav-button prev" id="prevBtn" aria-label="Lección anterior">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </button>
+
+                <button class="nav-button next" id="nextBtn" aria-label="Siguiente lección">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <!-- Slide Indicators -->
+                <div class="indicators" id="indicators">
+                    <div class="indicator active" data-slide="0"></div>
+                    <div class="indicator" data-slide="1"></div>
+                    <div class="indicator" data-slide="2"></div>
+                    <div class="indicator" data-slide="3"></div>
+                    <div class="indicator" data-slide="4"></div>
                 </div>
+
+            </div>
+
+            <!-- Fun Facts Section -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <button onclick="startGame('supermercado')"
+                    class="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-yellow-200">
+                    Explorador Supermercado🧠</button>
+
+                <button onclick="startGame('cocina')"
+                    class="bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-green-200">
+                    La Cocina Sin Gluten🍕</button>
+
+                <button onclick="startGame('escuela')"
+                    class="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-blue-200">
+                    Amigos en la Escuela💪</button>
             </div>
         </div>
-
         <!-- =============== CONTENEDOR DEL JUEGO ========================= -->
         <div id="game-container" class="hidden">
             <div class="flex justify-between items-center mb-6">
-                <button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Volver</button>
+                <button onclick="backToMenu()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Volver</button>
                 <div class="text-xl font-bold">Puntos: <span id="score">0</span></div>
             </div>
 
@@ -73,327 +527,461 @@
 
             <div id="feedback" class="mt-6 text-center hidden">
                 <p id="feedback-text" class="text-xl mb-4"></p>
-                <button onclick="nextRound()" id="siguiente" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
+                <button onclick="nextRound()" id="siguiente"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer class="bg-gray-800 text-white py-4 text-center text-sm mt-4">
-        <p>Plataforma educativa para niños – Compatible con Ceibal</p>
+    <!-- <footer class="bg-gray-800 text-white py-4 text-center text-sm mt-4" style="position: relative;">
+        <p>Plataforma educativa para niños</p>
         <p>© 2025 Aventura Sin Gluten</p>
-    </footer>
+    </footer> -->
 
-<!-- ==================================================================== -->
-<!--                         SCRIPT PRINCIPAL                              -->
-<!-- ==================================================================== -->
-<script>
-/* ---------------------------------------------------------------------- */
-/* 1. Datos de Productos para el Supermercado --------------------------- */
-const products = {
-  supermercado: [
-    { name: 'Pan Sin TACC',         glutenFree: true,  info: 'El pan especial para celíacos está hecho con harinas como arroz o maíz.' },
-    { name: 'Galletas',             glutenFree: false, info: 'Las galletas comunes contienen trigo y no son aptas para celíacos.' },
-    { name: 'Avena Certificada',    glutenFree: true,  info: 'La avena pura sin contaminación cruzada es segura.' },
-    { name: 'Pasta regular',        glutenFree: false, info: 'La pasta normal contiene trigo. Busca pasta de arroz o maíz.' },
-    { name: 'Harina de Arroz',      glutenFree: true,  info: 'Las harinas alternativas no contienen gluten.' },
-    { name: 'Barras de cereal',     glutenFree: false, info: 'Muchas barras contienen malta de cebada, que tiene gluten.' }
-  ]
-};
+    <script>
+        class CeliacEducationCarousel {
+            constructor() {
+                this.currentSlide = 0;
+                this.totalSlides = 5;
+                this.isAutoPlaying = true;
+                this.autoPlayInterval = null;
 
-/* ---------------------------------------------------------------------- */
-/* 1A. Escenarios para el juego "Amigos en la Escuela" ------------------- */
-const escenariosEscuela = [
-  {
-    situacion: 'Llevas a tu amigo a casa a merendar.',
-    opciones: [
-      { texto: 'Darle galletas', glutenFree: false, info: 'Las galletas comunes pueden contener gluten.' },
-      { texto: 'Preguntarle qué opciones de galletas puede comer', glutenFree: true, info: 'Preguntar primero te ayuda a ofrecer algo seguro.' }
-    ]
-  },
-  {
-    situacion: 'En el recreo, tu amigo tiene hambre.',
-    opciones: [
-      { texto: 'Compartir tu sándwich de jamón y queso', glutenFree: false, info: 'El pan del sándwich contiene gluten.' },
-      { texto: 'Ofrecerle una fruta', glutenFree: true, info: 'La fruta es naturalmente libre de gluten.' }
-    ]
-  },
-  {
-    situacion: 'Hay una fiesta de cumpleaños en clase.',
-    opciones: [
-      { texto: 'Preparar una torta sin gluten', glutenFree: true, info: 'Así tu amigo puede disfrutar sin riesgos.' },
-      { texto: 'Comprar tortas normales', glutenFree: false, info: 'Las tortas comunes contienen gluten.' }
-    ]
-  },
-  {
-    situacion: 'La cantina de la escuela tiene un menú nuevo.',
-    opciones: [
-      { texto: 'Elegir las empanadas de carne', glutenFree: false, info: 'La masa de las empanadas contiene gluten.' },
-      { texto: 'Preguntar si hay opciones sin TACC', glutenFree: true, info: 'Es importante preguntar por opciones sin gluten.' }
-    ]
-  },
-  {
-    situacion: 'Clase de cocina en la escuela.',
-    opciones: [
-      { texto: 'Usar harina de trigo', glutenFree: false, info: 'La harina de trigo contiene gluten.' },
-      { texto: 'Proponer usar harina de arroz', glutenFree: true, info: 'La harina de arroz es una opción sin gluten.' }
-    ]
-  }
-];
+                this.carouselTrack = document.getElementById('carouselTrack');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.indicators = document.querySelectorAll('.indicator');
+                this.progressFill = document.getElementById('progressFill');
+                this.carouselContainer = document.querySelector('.carousel-container');
 
-/* ---------------------------------------------------------------------- */
-/* 2. Recetas para el Modo Cocina -------------------------------------- */
-const recipes = [
-  {
-    title: 'Panqueques de Banana',
-    ingredients: [
-      { name: 'Banana',                 glutenFree: true,  info: 'Fruta natural, siempre segura.' },
-      { name: 'Harina de Almendra',     glutenFree: true,  info: 'Harina de frutos secos sin gluten.' },
-      { name: 'Harina de Trigo',        glutenFree: false, info: 'Contiene gluten.' },
-      { name: 'Polvo de hornear',       glutenFree: false, info: 'Puede contener gluten.' },
-      { name: 'Huevos',                 glutenFree: true, info: 'Los huevos son libres de gluten.' },
-      { name: 'Vainilla',               glutenFree: false, info: 'La vainilla puede contener gluten.' }
-    ]
-  },
-  {
-    title: 'Pizza de Coliflor',
-    ingredients: [
-      { name: 'Coliflor',             glutenFree: true,  info: 'Verdura libre de gluten.' },
-      { name: 'Harina de Arroz',      glutenFree: true,  info: 'Harina apta sin gluten.' },
-      { name: 'Salami',               glutenFree: false, info: 'Algunos embutidos llevan gluten de relleno.' },
-      { name: 'Queso Mozzarella',     glutenFree: false,  info: 'El queso natural no contiene gluten, pero puede que algunos se le agregan productos en su elaboración que sí tienen gluten.' },
-      { name: 'Levadura',             glutenFree: false,  info: 'La levadura puede estar contaminada en su proceso de elaboración.' },
-      { name: 'Agua',                 glutenFree: true,  info: 'El agua son libres de gluten.' }
-    ]
-  },
-  {
-    title: 'Galletitas de Coco',
-    ingredients: [
-      { name: 'Coco',                           glutenFree: true,  info: 'Coco es una fruta sin gluten.' },
-      { name: 'Harina de Avena certificada',    glutenFree: true,  info: 'La Avena es libre de gluten, si se encuentra procesada en una fábrica donde no procesan trigo .' },
-      { name: 'Harina de Trigo',                glutenFree: false, info: 'Contiene gluten.' },
-      { name: 'Azúcar',                         glutenFree: true,  info: 'El azúcar son libres de gluten.' },
-      { name: 'Vainilla certificada',           glutenFree: true,  info: 'La vainilla certificada no contiene gluten.' },
-      { name: 'Huevos',                         glutenFree: true,  info: 'Los huevos son libres de gluten.' }
-    ]
-  }
-];
+                this.init();
+            }
 
-/* ---------------------------------------------------------------------- */
-/* 3. Variables de estado ---------------------------------------------- */
-let currentGame = '', currentRound = 0, roundsPerGame = 5, score = 0, selectedIngredients = [];
+            init() {
+                // Event listeners for navigation buttons
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
 
-/* ---------------------------------------------------------------------- */
-/* 4. FLUJO GENERAL DEL JUEGO ------------------------------------------ */
-function startGame(game) {
-  currentGame = game;
-  currentRound = 0;
-  score = 0;
-  selectedIngredients = [];
+                // Event listeners for indicators
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => this.goToSlide(index));
+                });
 
-  // Determinamos la cantidad de rondas según el juego
-  roundsPerGame = (game === 'cocina')    ? recipes.length :
-                  (game === 'escuela')   ? escenariosEscuela.length :
-                                           5; // supermercado
+                // Auto-play controls
+                this.carouselContainer.addEventListener('mouseenter', () => this.pauseAutoPlay());
+                this.carouselContainer.addEventListener('mouseleave', () => this.resumeAutoPlay());
 
-  // Reiniciamos indicadores visuales
-  document.getElementById('score').textContent = score;
-  document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('menu').classList.add('hidden');
-  document.getElementById('game-container').classList.remove('hidden');
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevSlide();
+                    if (e.key === 'ArrowRight') this.nextSlide();
+                });
 
-  // Título genérico (se sobrescribirá en Amigos‑Escuela y Cocina)
-  document.getElementById('game-title').textContent = {
-    supermercado: 'Explorador del Supermercado',
-    cocina:       'Elige los ingredientes sin gluten',
-    escuela:      'Amigos en la Escuela'
-  }[game];
+                // Touch/swipe support
+                this.addTouchSupport();
 
-  nextRound();
-}
+                // Start auto-play with longer intervals for reading
+                this.startAutoPlay();
 
-function backToMenu() {
-  document.getElementById('game-container').classList.add('hidden');
-  document.getElementById('menu').classList.remove('hidden');
-  document.getElementById('feedback').classList.add('hidden');
-  if (document.getElementById('retry-btn')){
-    document.getElementById('retry-btn').remove();
-  }
-  incorrectList = [];
-  correctList = [];
-}
+                // Update initial state
+                this.updateCarousel();
+            }
 
-function nextRound() {
+            nextSlide() {
+                this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+                this.updateCarousel();
+            }
 
-  document.getElementById('feedback').classList.add('hidden');
+            prevSlide() {
+                this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+                this.updateCarousel();
+            }
 
-  if (currentRound >= roundsPerGame){
-    updateProgress();
-    return endGame();
-  } 
+            goToSlide(index) {
+                this.currentSlide = index;
+                this.updateCarousel();
+            }
 
-  updateProgress();
-  selectedIngredients = [];
+            updateCarousel() {
+                // Update track position
+                const translateX = -this.currentSlide * 100;
+                this.carouselTrack.style.transform = `translateX(${translateX}%)`;
 
-  const gameArea = document.getElementById('game-area');
-  gameArea.innerHTML = '';
+                // Update indicators
+                this.indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentSlide);
+                });
 
-  /* ----------------- LÓGICA POR MODO DE JUEGO ----------------------- */
-  if (currentGame === 'escuela') {
-    // ===== MODO ESCUELA (NUEVO) =========
-    const escenario = escenariosEscuela[currentRound];
-    document.getElementById('game-title').textContent = escenario.situacion;
+                // Update progress bar
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                this.progressFill.style.width = `${progress}%`;
+            }
 
-    // Renderizamos 1 fila de 2 opciones
-    gameArea.className = 'game-container grid  gap-4';
+            startAutoPlay() {
+                if (this.isAutoPlaying) {
+                    // Longer interval for educational content
+                    this.autoPlayInterval = setInterval(() => {
+                        this.nextSlide();
+                    }, 8000);
+                }
+            }
 
-    escenario.opciones.forEach(op => {
-      const card = document.createElement('div');
-      card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
-      card.innerHTML = `<h3 class='font-bold'>${op.texto}</h3>`;
-      card.onclick = () => checkSingleAnswer(op.glutenFree, op.info, card);
-      gameArea.appendChild(card);
-    });
-  }
-  else if (currentGame === 'cocina') {
-    // ===== MODO COCINA =============================================
-    const recipe = recipes[currentRound];
-    document.getElementById('game-title').textContent = `Receta: ${recipe.title} – Elige los ${recipe.ingredients.filter(i => i.glutenFree).length} ingredientes seguros`;
-    
-    gameArea.className = 'game-container grid gap-4';
+            pauseAutoPlay() {
+                this.isAutoPlaying = false;
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                }
+            }
 
-    recipe.ingredients.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
-      card.innerHTML = `<h3 class='font-bold'>${item.name}</h3>`;
-      card.onclick = () => toggleSelection(card, item);
-      gameArea.appendChild(card);
-    });
+            resumeAutoPlay() {
+                this.isAutoPlaying = true;
+                this.startAutoPlay();
+            }
 
-    const confirmBtn = document.createElement('button');
-    confirmBtn.id = 'confirm-btn';
-    confirmBtn.textContent = 'Confirmar selección';
-    confirmBtn.disabled = true;
-    confirmBtn.className = 'mt-4 bg-blue-500 disabled:bg-blue-300 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg';
-    confirmBtn.onclick = confirmarSeleccion;
-    gameArea.appendChild(confirmBtn);
-  }
-  else {
-    // ===== MODO SUPERMERCADO =======================================
-    const pool = [...products.supermercado];
-    const roundItems = [];
-    for (let i = 0; i < 4; i++) roundItems.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+            addTouchSupport() {
+                let startX = 0;
+                let endX = 0;
 
-    gameArea.className = 'game-container grid gap-4';
+                this.carouselContainer.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                });
 
-    roundItems.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
-      card.innerHTML = `<h3 class='font-bold'>${item.name}</h3>`;
-      card.onclick = () => checkSingleAnswer(item.glutenFree, item.info, card);
-      gameArea.appendChild(card);
-    });
-  }
-  currentRound++;
-}
+                this.carouselContainer.addEventListener('touchend', (e) => {
+                    endX = e.changedTouches[0].clientX;
+                    this.handleSwipe();
+                });
 
-/* ---------------------------------------------------------------------- */
-/* 5. SELECCIÓN DE INGREDIENTES EN MODO COCINA ------------------------- */
-function toggleSelection(card, item) {
-  const selected = card.classList.toggle('selected');
-  if (selected) selectedIngredients.push(item); else selectedIngredients = selectedIngredients.filter(i => i !== item);
-  document.getElementById('confirm-btn').disabled = selectedIngredients.length === 0;
-}
+                this.handleSwipe = () => {
+                    const swipeThreshold = 50;
+                    const diff = startX - endX;
 
-/* ---------------------------------------------------------------------- */
-/* 6. LÓGICA COMÚN PARA CHEQUEAR RESPUESTAS --------------------------- */
-function checkSingleAnswer(isSafe, info, card) {
-  document.querySelectorAll('.product-card').forEach(c => c.onclick = null);
-  card.classList.add(isSafe ? 'safe' : 'unsafe');
-  mostrarFeedback(isSafe, info);
-  if (isSafe) {
-    score += 20;
-    document.getElementById('score').textContent = score;
-  }
-  document.getElementById('siguiente').classList.remove('hidden');
-}
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                };
+            }
+        }
 
-/* ---------------------------------------------------------------------- */
-/* 7. CONFIRMAR SELECCIÓN EN MODO COCINA ------------------------------ */
-function confirmarSeleccion() {
-  const recipe = recipes[currentRound];
-  const correctItems = recipe.ingredients.filter(i => i.glutenFree);
+        // Initialize carousel when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new CeliacEducationCarousel();
+        });
+    </script>
 
-  if (selectedIngredients.length < correctItems.length) {
-    alert(`¡Vas bien! Pero aún faltan ingredientes. Selecciona ${correctItems.length - selectedIngredients.length} más.`);
-    return;
-  }
+    <!-- ==================================================================== -->
+    <!--                         SCRIPT PRINCIPAL                              -->
+    <!-- ==================================================================== -->
+    <script>
+        /* ---------------------------------------------------------------------- */
+        /* 1. Datos de Productos para el Supermercado --------------------------- */
+        const products = {
+            supermercado: [
+                { name: 'Pan Sin TACC', glutenFree: true, info: 'El pan especial para celíacos está hecho con harinas como arroz o maíz.' },
+                { name: 'Galletas', glutenFree: false, info: 'Las galletas comunes contienen trigo y no son aptas para celíacos.' },
+                { name: 'Avena Certificada', glutenFree: true, info: 'La avena pura sin contaminación cruzada es segura.' },
+                { name: 'Pasta regular', glutenFree: false, info: 'La pasta normal contiene trigo. Busca pasta de arroz o maíz.' },
+                { name: 'Harina de Arroz', glutenFree: true, info: 'Las harinas alternativas no contienen gluten.' },
+                { name: 'Barras de cereal', glutenFree: false, info: 'Muchas barras contienen malta de cebada, que tiene gluten.' }
+            ]
+        };
 
-  document.querySelectorAll('.product-card').forEach(c => c.onclick = null);
-  document.getElementById('confirm-btn').remove();
+        /* ---------------------------------------------------------------------- */
+        /* 1A. Escenarios para el juego "Amigos en la Escuela" ------------------- */
+        const escenariosEscuela = [
+            {
+                situacion: 'Llevas a tu amigo a casa a merendar.',
+                opciones: [
+                    { texto: 'Darle galletas', glutenFree: false, info: 'Las galletas comunes pueden contener gluten.' },
+                    { texto: 'Preguntarle qué opciones de galletas puede comer', glutenFree: true, info: 'Preguntar primero te ayuda a ofrecer algo seguro.' }
+                ]
+            },
+            {
+                situacion: 'En el recreo, tu amigo tiene hambre.',
+                opciones: [
+                    { texto: 'Compartir tu sándwich de jamón y queso', glutenFree: false, info: 'El pan del sándwich contiene gluten.' },
+                    { texto: 'Ofrecerle una fruta', glutenFree: true, info: 'La fruta es naturalmente libre de gluten.' }
+                ]
+            },
+            {
+                situacion: 'Hay una fiesta de cumpleaños en clase.',
+                opciones: [
+                    { texto: 'Preparar una torta sin gluten', glutenFree: true, info: 'Así tu amigo puede disfrutar sin riesgos.' },
+                    { texto: 'Comprar tortas normales', glutenFree: false, info: 'Las tortas comunes contienen gluten.' }
+                ]
+            },
+            {
+                situacion: 'La cantina de la escuela tiene un menú nuevo.',
+                opciones: [
+                    { texto: 'Elegir las empanadas de carne', glutenFree: false, info: 'La masa de las empanadas contiene gluten.' },
+                    { texto: 'Preguntar si hay opciones sin TACC', glutenFree: true, info: 'Es importante preguntar por opciones sin gluten.' }
+                ]
+            },
+            {
+                situacion: 'Clase de cocina en la escuela.',
+                opciones: [
+                    { texto: 'Usar harina de trigo', glutenFree: false, info: 'La harina de trigo contiene gluten.' },
+                    { texto: 'Proponer usar harina de arroz', glutenFree: true, info: 'La harina de arroz es una opción sin gluten.' }
+                ]
+            }
+        ];
 
-  let correctList = [], incorrectList = [];
-  selectedIngredients.forEach(item => {
-    const cardEl = [...document.querySelectorAll('.product-card')].find(c => c.textContent === item.name);
-    if (item.glutenFree) {
-      cardEl.classList.add('safe');
-      correctList.push(`<li>✅ ${item.name} – ${item.info}</li>`);
-      score += 20;
-    } else {
-      cardEl.classList.add('unsafe');
-      incorrectList.push(`<li>❌ ${item.name} – ${item.info}</li>`);
-    }
-  });
+        /* ---------------------------------------------------------------------- */
+        /* 2. Recetas para el Modo Cocina -------------------------------------- */
+        const recipes = [
+            {
+                title: 'Panqueques de Banana',
+                ingredients: [
+                    { name: 'Banana', glutenFree: true, info: 'Fruta natural, siempre segura.' },
+                    { name: 'Harina de Almendra', glutenFree: true, info: 'Harina de frutos secos sin gluten.' },
+                    { name: 'Harina de Trigo', glutenFree: false, info: 'Contiene gluten.' },
+                    { name: 'Polvo de hornear', glutenFree: false, info: 'Puede contener gluten.' },
+                    { name: 'Huevos', glutenFree: true, info: 'Los huevos son libres de gluten.' },
+                    { name: 'Vainilla', glutenFree: false, info: 'La vainilla puede contener gluten.' }
+                ]
+            },
+            {
+                title: 'Pizza de Coliflor',
+                ingredients: [
+                    { name: 'Coliflor', glutenFree: true, info: 'Verdura libre de gluten.' },
+                    { name: 'Harina de Arroz', glutenFree: true, info: 'Harina apta sin gluten.' },
+                    { name: 'Salami', glutenFree: false, info: 'Algunos embutidos llevan gluten de relleno.' },
+                    { name: 'Queso Mozzarella', glutenFree: false, info: 'El queso natural no contiene gluten, pero puede que algunos se le agregan productos en su elaboración que sí tienen gluten.' },
+                    { name: 'Levadura', glutenFree: false, info: 'La levadura puede estar contaminada en su proceso de elaboración.' },
+                    { name: 'Agua', glutenFree: true, info: 'El agua son libres de gluten.' }
+                ]
+            },
+            {
+                title: 'Galletitas de Coco',
+                ingredients: [
+                    { name: 'Coco', glutenFree: true, info: 'Coco es una fruta sin gluten.' },
+                    { name: 'Harina de Avena certificada', glutenFree: true, info: 'La Avena es libre de gluten, si se encuentra procesada en una fábrica donde no procesan trigo .' },
+                    { name: 'Harina de Trigo', glutenFree: false, info: 'Contiene gluten.' },
+                    { name: 'Azúcar', glutenFree: true, info: 'El azúcar son libres de gluten.' },
+                    { name: 'Vainilla certificada', glutenFree: true, info: 'La vainilla certificada no contiene gluten.' },
+                    { name: 'Huevos', glutenFree: true, info: 'Los huevos son libres de gluten.' }
+                ]
+            }
+        ];
 
-  document.getElementById('score').textContent = score;
+        /* ---------------------------------------------------------------------- */
+        /* 3. Variables de estado ---------------------------------------------- */
+        let currentGame = '', currentRound = 0, roundsPerGame = 5, score = 0, selectedIngredients = [];
 
-  const feedback     = document.getElementById('feedback');
-  const feedbackText = document.getElementById('feedback-text');
-  let html = '';
-  if (correctList.length)   html += `<p class='font-bold text-green-700 mb-2'>Ingredientes correctos:</p><ul class='mb-4 list-disc list-inside text-green-700'>${correctList.join('')}</ul>`;
-  if (incorrectList.length) html += `<p class='font-bold text-red-700 mb-2'>Ingredientes con gluten:</p><ul class='list-disc list-inside text-red-700 mb-4'>${incorrectList.join('')}</ul>`;
-  feedbackText.innerHTML = html;
+        /* ---------------------------------------------------------------------- */
+        /* 4. FLUJO GENERAL DEL JUEGO ------------------------------------------ */
+        function startGame(game) {
+            currentGame = game;
+            currentRound = 0;
+            score = 0;
+            selectedIngredients = [];
 
-  const nextBtn = feedback.querySelector('button');
-  nextBtn.classList.toggle('hidden', incorrectList.length > 0);
-  console.log('incorrectList.length:', incorrectList.length);
+            // Determinamos la cantidad de rondas según el juego
+            roundsPerGame = (game === 'cocina') ? recipes.length :
+                (game === 'escuela') ? escenariosEscuela.length :
+                    5; // supermercado
 
-  if (incorrectList.length) {
-    let retryBtn = document.getElementById('retry-btn');
-    if (!retryBtn) {
-      retryBtn = document.createElement('button');
-      retryBtn.id = 'retry-btn';
-      retryBtn.textContent = 'Reintentar';
-      retryBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg';
-      retryBtn.onclick = () => {
-        feedback.classList.add('hidden');
-        retryBtn.remove();
-        currentRound -= 1; // volvemos a intentar la misma receta
-        nextRound();
-      };
-      feedback.appendChild(retryBtn);
-    }
-  }
+            // Reiniciamos indicadores visuales
+            document.getElementById('score').textContent = score;
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
 
-  feedback.classList.remove('hidden');
-}
+            // Título genérico (se sobrescribirá en Amigos‑Escuela y Cocina)
+            document.getElementById('game-title').textContent = {
+                supermercado: 'Explorador del Supermercado',
+                cocina: 'Elige los ingredientes sin gluten',
+                escuela: 'Amigos en la Escuela'
+            }[game];
 
-/* ---------------------------------------------------------------------- */
-/* 8. UTILIDADES GENERALES -------------------------------------------- */
-function mostrarFeedback(isSafe, info) {
-  const feedback = document.getElementById('feedback');
-  const feedbackText = document.getElementById('feedback-text');
-  feedbackText.innerHTML = `<span class='${isSafe ? 'text-green-700' : 'text-red-700'} font-bold'>${isSafe ? '¡Correcto!' : '¡Cuidado!'}</span> ${info}`;
-  feedback.classList.remove('hidden');
-}
+            nextRound();
+        }
 
-function updateProgress() {
-  const avance = (currentRound / roundsPerGame) * 100;
-  document.getElementById('progress-bar').style.width = avance + '%';
-}
+        function backToMenu() {
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+            document.getElementById('feedback').classList.add('hidden');
+            if (document.getElementById('retry-btn')) {
+                document.getElementById('retry-btn').remove();
+            }
+            incorrectList = [];
+            correctList = [];
+        }
 
-function endGame() {
-  const gameArea = document.getElementById('game-area');
-  gameArea.innerHTML = `
+        function nextRound() {
+
+            document.getElementById('feedback').classList.add('hidden');
+
+            if (currentRound >= roundsPerGame) {
+                updateProgress();
+                return endGame();
+            }
+
+            updateProgress();
+            selectedIngredients = [];
+
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+
+            /* ----------------- LÓGICA POR MODO DE JUEGO ----------------------- */
+            if (currentGame === 'escuela') {
+                // ===== MODO ESCUELA (NUEVO) =========
+                const escenario = escenariosEscuela[currentRound];
+                document.getElementById('game-title').textContent = escenario.situacion;
+
+                // Renderizamos 1 fila de 2 opciones
+                gameArea.className = 'game-container grid  gap-4';
+
+                escenario.opciones.forEach(op => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
+                    card.innerHTML = `<h3 class='font-bold'>${op.texto}</h3>`;
+                    card.onclick = () => checkSingleAnswer(op.glutenFree, op.info, card);
+                    gameArea.appendChild(card);
+                });
+            }
+            else if (currentGame === 'cocina') {
+                // ===== MODO COCINA =============================================
+                const recipe = recipes[currentRound];
+                document.getElementById('game-title').textContent = `Receta: ${recipe.title} – Elige los ${recipe.ingredients.filter(i => i.glutenFree).length} ingredientes seguros`;
+
+                gameArea.className = 'game-container grid gap-4';
+
+                recipe.ingredients.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
+                    card.innerHTML = `<h3 class='font-bold'>${item.name}</h3>`;
+                    card.onclick = () => toggleSelection(card, item);
+                    gameArea.appendChild(card);
+                });
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.id = 'confirm-btn';
+                confirmBtn.textContent = 'Confirmar selección';
+                confirmBtn.disabled = true;
+                confirmBtn.className = 'mt-4 bg-blue-500 disabled:bg-blue-300 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg';
+                confirmBtn.onclick = confirmarSeleccion;
+                gameArea.appendChild(confirmBtn);
+            }
+            else {
+                // ===== MODO SUPERMERCADO =======================================
+                const pool = [...products.supermercado];
+                const roundItems = [];
+                for (let i = 0; i < 4; i++) roundItems.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+
+                gameArea.className = 'game-container grid gap-4';
+
+                roundItems.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card bg-white rounded-xl p-4 cursor-pointer text-center shadow-md transition-all duration-200';
+                    card.innerHTML = `<h3 class='font-bold'>${item.name}</h3>`;
+                    card.onclick = () => checkSingleAnswer(item.glutenFree, item.info, card);
+                    gameArea.appendChild(card);
+                });
+            }
+            currentRound++;
+        }
+
+        /* ---------------------------------------------------------------------- */
+        /* 5. SELECCIÓN DE INGREDIENTES EN MODO COCINA ------------------------- */
+        function toggleSelection(card, item) {
+            const selected = card.classList.toggle('selected');
+            if (selected) selectedIngredients.push(item); else selectedIngredients = selectedIngredients.filter(i => i !== item);
+            document.getElementById('confirm-btn').disabled = selectedIngredients.length === 0;
+        }
+
+        /* ---------------------------------------------------------------------- */
+        /* 6. LÓGICA COMÚN PARA CHEQUEAR RESPUESTAS --------------------------- */
+        function checkSingleAnswer(isSafe, info, card) {
+            document.querySelectorAll('.product-card').forEach(c => c.onclick = null);
+            card.classList.add(isSafe ? 'safe' : 'unsafe');
+            mostrarFeedback(isSafe, info);
+            if (isSafe) {
+                score += 20;
+                document.getElementById('score').textContent = score;
+            }
+            document.getElementById('siguiente').classList.remove('hidden');
+        }
+
+        /* ---------------------------------------------------------------------- */
+        /* 7. CONFIRMAR SELECCIÓN EN MODO COCINA ------------------------------ */
+        function confirmarSeleccion() {
+            const recipe = recipes[currentRound - 1];
+            const correctItems = recipe.ingredients.filter(i => i.glutenFree);
+
+            // if (selectedIngredients.filter(i => i.glutenFree).length < correctItems.length) {
+            //     alert(`¡Vas bien! Pero aún faltan ingredientes. Selecciona ${correctItems.length - selectedIngredients.filter(i => i.glutenFree).length} más.`);
+            //     return;
+            // }
+
+            document.querySelectorAll('.product-card').forEach(c => c.onclick = null);
+            document.getElementById('confirm-btn').remove();
+
+            let correctList = [], incorrectList = [];
+            selectedIngredients.forEach(item => {
+                const cardEl = [...document.querySelectorAll('.product-card')].find(c => c.textContent === item.name);
+                if (item.glutenFree) {
+                    cardEl.classList.add('safe');
+                    correctList.push(`<li>✅ ${item.name} – ${item.info}</li>`);
+                    score += 20;
+                } else {
+                    cardEl.classList.add('unsafe');
+                    incorrectList.push(`<li>❌ ${item.name} – ${item.info}</li>`);
+                }
+            });
+
+            document.getElementById('score').textContent = score;
+
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedback-text');
+            let html = '';
+            if (correctList.length) html += `<p class='font-bold text-green-700 mb-2'>Ingredientes correctos:</p><ul class='mb-4 list-disc list-inside text-green-700'>${correctList.join('')}</ul>`;
+            if (incorrectList.length) html += `<p class='font-bold text-red-700 mb-2'>Ingredientes con gluten:</p><ul class='list-disc list-inside text-red-700 mb-4'>${incorrectList.join('')}</ul>`;
+            feedbackText.innerHTML = html;
+
+            const nextBtn = feedback.querySelector('button');
+            nextBtn.classList.toggle('hidden', incorrectList.length > 0);
+            console.log('incorrectList.length:', incorrectList.length);
+
+            if (incorrectList.length) {
+                let retryBtn = document.getElementById('retry-btn');
+                if (!retryBtn) {
+                    retryBtn = document.createElement('button');
+                    retryBtn.id = 'retry-btn';
+                    retryBtn.textContent = 'Reintentar';
+                    retryBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg';
+                    retryBtn.onclick = () => {
+                        feedback.classList.add('hidden');
+                        retryBtn.remove();
+                        currentRound -= 1; // volvemos a intentar la misma receta
+                        nextRound();
+                    };
+                    feedback.appendChild(retryBtn);
+                }
+            }
+
+            feedback.classList.remove('hidden');
+        }
+
+        /* ---------------------------------------------------------------------- */
+        /* 8. UTILIDADES GENERALES -------------------------------------------- */
+        function mostrarFeedback(isSafe, info) {
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackText.innerHTML = `<span class='${isSafe ? 'text-green-700' : 'text-red-700'} font-bold'>${isSafe ? '¡Correcto!' : '¡Cuidado!'}</span> ${info}`;
+            feedback.classList.remove('hidden');
+        }
+
+        function updateProgress() {
+            const avance = (currentRound / roundsPerGame) * 100;
+            document.getElementById('progress-bar').style.width = avance + '%';
+        }
+
+        function endGame() {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = `
     <div class='col-span-full bg-white rounded-xl p-8 text-center shadow-lg'>
       <h3 class='text-2xl font-bold mb-4'>¡Juego Completado!</h3>
       <p class='text-xl mb-6'>Tu puntuación: ${score} puntos</p>
@@ -402,17 +990,9 @@ function endGame() {
         <button onclick='backToMenu()' class='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg'>Menú principal</button>
       </div>
     </div>`;
-}
-</script>
+        }
+    </script>
 
-<!-- ==================================================================== -->
-<!--                       ESTILOS EXTRA                                  -->
-<!-- ==================================================================== -->
-<style>
-.safe      { background-color:#d1fae5 }
-.unsafe    { background-color:#fee2e2 }
-.selected  { outline:3px solid #f59e0b }
-</style>
 </body>
-</html>
 
+</html>
