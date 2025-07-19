@@ -525,7 +525,7 @@
 
             <div id="game-area" class="game-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 
-            <div id="feedback" class="mt-6 text-center hidden">
+            <div id="feedback" class="mt-6 text-center hidden mb-6">
                 <p id="feedback-text" class="text-xl mb-4"></p>
                 <button onclick="nextRound()" id="siguiente"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Siguiente</button>
@@ -847,7 +847,7 @@
                 const recipe = recipes[currentRound];
                 document.getElementById('game-title').textContent = `Receta: ${recipe.title} – Elige los ${recipe.ingredients.filter(i => i.glutenFree).length} ingredientes seguros`;
 
-                gameArea.className = 'game-container grid gap-4';
+                gameArea.className = 'game-container grid gap-4 pb-12';
 
                 recipe.ingredients.forEach(item => {
                     const card = document.createElement('div');
@@ -871,7 +871,7 @@
                 const roundItems = [];
                 for (let i = 0; i < 4; i++) roundItems.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
 
-                gameArea.className = 'game-container grid gap-4';
+                gameArea.className = 'game-container grid gap-4 pb-12';
 
                 roundItems.forEach(item => {
                     const card = document.createElement('div');
